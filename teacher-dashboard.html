@@ -8,119 +8,104 @@
     <link rel="stylesheet" href="assets-css-style.css">
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 p-4 md:p-6">
+
+    <!-- نافذة قفل الاشتراك (تظهر إذا لم يتم التفعيل) -->
+    <div id="subscription-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl text-right">
+            <h3 class="text-xl font-bold text-red-600 mb-3">🔒 اشتراك المنصة منتهي أو غير مفعل</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                عزيزي المعلم/ة، لقد استنفذت التجربة المجانية أو لم تقم بتفعيل حسابك. للاستمرار في إنشاء الاختبارات والحصول على التقارير، يرجى التواصل مع إدارة <strong>EduServices 2026</strong> لتفعيل اشتراكك والحصول على مفتاح التفعيل.
+            </p>
+            <input type="text" id="activation-key-input" class="w-full border p-3 rounded-lg mb-3 text-center font-mono" placeholder="أدخل مفتاح التفعيل هنا (مثال: EDU-9922)">
+            <button onclick="verifyActivationKey()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition">
+                تفعيل الحساب الآن
+            </button>
+            <div class="mt-4 text-center">
+                <a href="https://wa.me/966000000000" target="_blank" class="text-xs text-emerald-600 font-bold hover:underline">💬 تواصل مع الإدارة عبر واتساب لتجديد الاشتراك</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم الرئيسية -->
     <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-lg">
         <div class="flex justify-between items-center mb-6 border-b pb-3">
             <div>
-                <h2 class="text-2xl font-bold text-indigo-800">لوحة تحكم المعلم/ة - إعداد الاختبار</h2>
-                <p class="text-xs text-gray-500">EduServices 2026 © جميع الحقوق محفوظة</p>
+                <h2 class="text-2xl font-bold text-indigo-800">لوحة تحكم المعلم/ة - إعداد اختبار جديد</h2>
+                <p class="text-xs text-gray-500">EduServices 2026 - نظام الاشتراكات الآمن</p>
             </div>
             <a href="index.html" class="text-indigo-600 hover:underline text-sm font-semibold">← الرئيسية</a>
         </div>
 
         <form id="exam-setup-form" class="space-y-6">
-            <!-- عنوان الاختبار -->
             <div>
                 <label class="block font-semibold mb-2">عنوان الاختبار:</label>
-                <input type="text" id="exam-title" class="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value="إختبار عن بعد مراقب بالذكاء الإصطناعي" required>
+                <input type="text" id="exam-title" class="w-full border p-3 rounded-lg" value="اختبار الرياضيات النهائي" required>
             </div>
 
-            <!-- طريقة إدخال الأسئلة -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-semibold mb-2">رمز دخول الطلاب للاختبار (PIN):</label>
+                    <input type="text" id="exam-pin" class="w-full border p-3 rounded-lg font-mono font-bold text-indigo-700" placeholder="مثال: 2026" required>
+                    <p class="text-xs text-gray-500 mt-1">يجب مشاركة هذا الرمز مع طلابك ليتمكنوا من دخول الاختبار.</p>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-2">عدد الأسئلة:</label>
+                    <input type="number" id="questions-count" class="w-full border p-3 rounded-lg" min="1" value="5" required>
+                </div>
+            </div>
+
             <div>
-                <label class="block font-semibold mb-2">طريقة إضافة الأسئلة للاختبار:</label>
-                <select id="input-mode" onchange="toggleInputMode()" class="w-full border p-3 rounded-lg bg-gray-50 font-medium">
-                    <option value="pdf">الوضع السريع: رفع ملف الأسئلة (PDF / صورة) وتحديد الإجابات فقط</option>
-                    <option value="manual">الوضع التفاعلي: إدخال الأسئلة والخيارات والدرجات يدوياً</option>
-                </select>
+                <label class="block font-semibold mb-2">رفع ملف الأسئلة (PDF أو صورة):</label>
+                <input type="file" id="exam-file" class="w-full border p-2 rounded-lg bg-gray-50" accept=".pdf,image/*">
             </div>
 
-            <!-- خيار رفع الملف (الوضع السريع) -->
-            <div id="pdf-mode-container" class="space-y-4 border p-4 rounded-lg bg-indigo-50/50">
-                <div>
-                    <label class="block font-semibold mb-2 text-indigo-900">1. رفع ملف الأسئلة (PDF أو صورة):</label>
-                    <input type="file" id="exam-file" class="w-full border p-2 rounded-lg bg-white" accept=".pdf,image/*">
-                    <p class="text-xs text-gray-500 mt-1">* سيظهر هذا الملف للطلاب أثناء الاختبار للمعاينة فقط ودون إمكانية التنزيل.</p>
-                </div>
-
-                <div>
-                    <label class="block font-semibold mb-2 text-indigo-900">2. مفتاح الإجابات النموذجية للتصحيح التلقائي:</label>
-                    <p class="text-xs text-gray-600 mb-2">قم بكتابة رقم السؤال والإجابة الصحيحة والدرجة بشكل مبسط (مثال: <code class="bg-gray-200 px-1 rounded">1:أ:2</code> تعني السؤال الأول إجابته أ ودرجته 2):</p>
-                    <textarea id="answer-key" rows="4" class="w-full border p-3 rounded-lg bg-white font-mono dir-ltr text-left" placeholder="1:أ:1&#10;2:صح:1&#10;3:ج:2&#10;4:مقالي:3"></textarea>
-                </div>
+            <div>
+                <label class="block font-semibold mb-2">مفتاح الإجابات النموذجية:</label>
+                <textarea id="answer-key" rows="3" class="w-full border p-3 rounded-lg font-mono text-left" placeholder="1:ب&#10;2:أ&#10;3:صح"></textarea>
             </div>
 
-            <!-- خيار الإدخال اليدوي للأسئلة -->
-            <div id="manual-mode-container" class="hidden space-y-6">
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border">
-                    <span class="font-bold text-gray-700">قائمة الأسئلة اليدوية:</span>
-                    <button type="button" onclick="addManualQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">
-                        + إضافة سؤال جديد
-                    </button>
-                </div>
-
-                <div id="manual-questions-list" class="space-y-4">
-                    <!-- يتم توليد الأسئلة يدوياً هنا -->
-                </div>
-            </div>
-
-            <button type="button" onclick="saveExamSettings()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
-                حفظ وإصدار رابط الاختبار المخصص للطلاب 🔗
+            <button type="button" onclick="saveExamData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                حفظ الاختبار وتوليد رابط الطلاب المخصص 🔗
             </button>
         </form>
     </div>
 
     <script>
-        function toggleInputMode() {
-            const mode = document.getElementById('input-mode').value;
-            if (mode === 'manual') {
-                document.getElementById('pdf-mode-container').classList.add('hidden');
-                document.getElementById('manual-mode-container').classList.remove('hidden');
-                if(document.getElementById('manual-questions-list').children.length === 0) {
-                    addManualQuestion();
-                }
+        // التحقق من حالة اشتراك المعلم عند فتح اللوحة
+        window.onload = function() {
+            const isActivated = localStorage.getItem("eduservices_teacher_active");
+            if (isActivated !== "true") {
+                // عرض نافذة مطالبة الاشتراك
+                document.getElementById("subscription-modal").classList.remove("hidden");
+            }
+        };
+
+        // التحقق من مفتاح التفعيل الذي تدخله الإدارة
+        function verifyActivationKey() {
+            const inputKey = document.getElementById("activation-key-input").value.trim();
+            // مفاتيح التفعيل التي تصدرها أنت كمدير للموقع (يمكنك تغييرها أو جعلها ديناميكية)
+            const validKeys = ["EDU-2026", "VIP-999", "PRO-ADMIN"];
+
+            if (validKeys.includes(inputKey)) {
+                localStorage.setItem("eduservices_teacher_active", "true");
+                alert("تم تفعيل اشتراكك بنجاح! أهلاً بك في منصة EduServices.");
+                document.getElementById("subscription-modal").classList.add("hidden");
             } else {
-                document.getElementById('pdf-mode-container').classList.remove('hidden');
-                document.getElementById('manual-mode-container').classList.add('hidden');
+                alert("مفتاح التفعيل غير صحيح. يرجى مراجعة إدارة المنصة.");
             }
         }
 
-        let qCount = 0;
-        function addManualQuestion() {
-            qCount++;
-            const list = document.getElementById('manual-questions-list');
-            const qHTML = `
-                <div id="q-box-${qCount}" class="border p-4 rounded-xl bg-gray-50 relative space-y-3">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <span class="font-bold text-indigo-700">السؤال رقم (${qCount})</span>
-                        <button type="button" onclick="document.getElementById('q-box-${qCount}').remove()" class="text-red-500 hover:text-red-700 text-xs font-bold">حذف السؤال ✕</button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-1">نص السؤال (يدعم الرياضيات MathJax مثل $\\frac{a}{b}$):</label>
-                            <input type="text" class="w-full border p-2 rounded text-sm bg-white" placeholder="اكتب السؤال هنا...">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">نوع السؤال:</label>
-                            <select class="w-full border p-2 rounded text-sm bg-white">
-                                <option value="mcq">اختيار من متعدد</option>
-                                <option value="tf">صح أو خطأ</option>
-                                <option value="fill">إكمال الفراغ</option>
-                                <option value="essay">سؤال مقالي</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                        <input type="text" class="border p-2 rounded bg-white" placeholder="الخيار (أ) / صحيح">
-                        <input type="text" class="border p-2 rounded bg-white" placeholder="الخيار (ب) / خاطئ">
-                        <input type="text" class="border p-2 rounded bg-white" placeholder="الخيار (ج)">
-                        <input type="number" class="border p-2 rounded bg-white" placeholder="الدرجة" value="1">
-                    </div>
-                </div>
-            `;
-            list.insertAdjacentHTML('beforeend', qHTML);
-        }
-
-        function saveExamSettings() {
-            alert('تم حفظ كافة إعدادات الاختبار ومفاتيح الإجابات بنجاح!\n\nيمكنك الآن إرسال رابط صفحة الاختبار (Exam.html) لطلابك.');
+        // حفظ إعدادات الاختبار ورمز الدخول
+        function saveExamData() {
+            const pin = document.getElementById("exam-pin").value;
+            const title = document.getElementById("exam-title").value;
+            if(!pin) {
+                alert("الرجاء تحديد رمز دخول للطلاب!");
+                return;
+            }
+            localStorage.setItem("current_exam_pin", pin);
+            localStorage.setItem("current_exam_title", title);
+            alert("تم حفظ إعدادات الاختبار ورمز الدخول بنجاح!\nرابط الاختبار جاهز للمشاركة مع الطلاب.");
         }
     </script>
 </body>
