@@ -1,0 +1,7 @@
+body {
+background-color: #f8fafc;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+input[type="radio"], input[type="checkbox"] {
+accent-color: #4f46e5;
+}
