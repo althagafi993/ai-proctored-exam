@@ -9,7 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- مكتبة تحويل HTML إلى PDF باللغة العربية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="assets-css-style.css">
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -57,24 +58,75 @@
             🚨 تنبيه ذكي: تم رصد مخالفة لقوانين الاختبار وتسجيلها!
         </div>
 
+        <!-- السؤال العام للتجربة -->
         <div class="bg-white p-6 rounded-xl shadow space-y-6">
-            <h3 class="font-bold text-lg text-indigo-900 border-b pb-2">السؤال الأول (اختيار من متعدد مع دعم الرموز الرياضية $\int x dx$):</h3>
-            <p class="text-gray-700">ما هي قيمة التكامل $\int_{0}^{2} x \, dx$ ؟</p>
-            <div class="space-y-2">
-                <label class="block p-3 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q1" value="A"> أ) $1$</label>
-                <label class="block p-3 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q1" value="B"> ب) $2$</label>
-                <label class="block p-3 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q1" value="C"> ج) $4$</label>
+            <h3 class="font-bold text-lg text-indigo-900 border-b pb-2">السؤال الأول (اختيار من متعدد):</h3>
+            <p class="text-gray-800 font-semibold text-base">ما هي عاصمة المملكة العربية السعودية؟</p>
+            <div class="space-y-3">
+                <label class="block p-3 border rounded-lg cursor-pointer hover:bg-indigo-50/50 transition">
+                    <input type="radio" name="q1" value="جدة" class="ml-2"> أ) جدة
+                </label>
+                <label class="block p-3 border rounded-lg cursor-pointer hover:bg-indigo-50/50 transition">
+                    <input type="radio" name="q1" value="الرياض" class="ml-2"> ب) الرياض
+                </label>
+                <label class="block p-3 border rounded-lg cursor-pointer hover:bg-indigo-50/50 transition">
+                    <input type="radio" name="q1" value="مكة المكرمة" class="ml-2"> ج) مكة المكرمة
+                </label>
+                <label class="block p-3 border rounded-lg cursor-pointer hover:bg-indigo-50/50 transition">
+                    <input type="radio" name="q1" value="الدمام" class="ml-2"> د) الدمام
+                </label>
             </div>
         </div>
 
         <div class="mt-8 text-center">
             <button onclick="finishExam()" class="bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-3 rounded-xl shadow transition">
-                تسليم الاختبار وإنشاء التقرير للمعلم
+                تسليم الاختبار وإنشاء التقرير للمعلم/ة
             </button>
         </div>
     </div>
 
-    <!-- ربط ملفات الجافاسكربت بالأسماء المطابقة للمستودع -->
+    <!-- قالب التقرير العربي المخفي لتوليد الـ PDF -->
+    <div id="report-template" class="hidden p-8 bg-white text-right dir-rtl font-sans" style="width: 210mm;">
+        <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
+            <h1 style="font-size: 20px; font-weight: bold; color: #3730a3; margin: 0;">تقرير اختبار عن بعد مراقب بالذكاء الإصطناعي</h1>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">EduServices 2026 - جميع الحقوق محفوظة</p>
+        </div>
+
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.8;">
+            <p><strong>اسم الطالب/ـة:</strong> الطالب التجريبي</p>
+            <p><strong>عنوان الاختبار:</strong> إختبار عام مراقب بالذكاء الاصطناعي</p>
+            <p><strong>الدرجة المقترحة:</strong> <span style="color: #059669; font-weight: bold;">10 / 10</span></p>
+            <p><strong>حالة التقرير:</strong> مكتمل ومفحوص بواسطة الذكاء الاصطناعي</p>
+        </div>
+
+        <h3 style="font-size: 16px; font-weight: bold; color: #1e1b4b; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 15px;">سجل خروقات الذكاء الاصطناعي لكل سؤال:</h3>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 25px; text-align: right;">
+            <thead>
+                <tr style="background-color: #e0e7ff; color: #3730a3;">
+                    <th style="padding: 10px; border: 1px solid #c7d2fe;">السؤال</th>
+                    <th style="padding: 10px; border: 1px solid #c7d2fe;">الدرجة</th>
+                    <th style="padding: 10px; border: 1px solid #c7d2fe;">سجل الخروقات والملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #e5e7eb;">السؤال 1 (عاصمة السعودية)</td>
+                    <td style="padding: 10px; border: 1px solid #e5e7eb; color: #059669; font-weight: bold;">10 / 10</td>
+                    <td style="padding: 10px; border: 1px solid #e5e7eb; color: #059669;">سجل نظيف (لم يتم رصد استخدام جوال، كتاب، أو التفات جانبي)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="border: 1px dashed #4f46e5; padding: 15px; border-radius: 8px; font-size: 13px; background-color: #f5f3ff;">
+            <h4 style="font-weight: bold; color: #4338ca; margin-bottom: 8px;">صلاحيات وقرار المعلم/ة:</h4>
+            <p>[  ] اعتماد الدرجة الكاملة المستحقة للطالب/ـة.</p>
+            <p>[  ] استبعاد درجة سؤال أو أكثر بسبب وجود خرق.</p>
+            <p>[  ] إلغاء اختبار الطالب ورصد درجة (صفر).</p>
+        </div>
+    </div>
+
+    <!-- ربط ملفات الجافاسكربت -->
     <script src="assets-js-proctorin.js"></script>
     <script src="assets-js-exam-engine.js"></script>
     <script src="assets-js-report-gen.js"></script>
